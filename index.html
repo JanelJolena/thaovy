@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tui làm cho Tvy ♡</title>
+<style>
+  :root{
+    --pink:#f472b6; --pink2:#fb7185; --bg:#fff1f2; --ink:#6b7280; --border:#fecdd3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#374151;background:var(--bg)}
+  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.85);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--border)}
+  .wrap{max-width:980px;margin:auto;padding:16px}
+  .brand{font-weight:800;color:var(--pink2)}
+  nav{display:flex;gap:8px}
+  .tab{border:1px solid var(--border);background:#fff;color:var(--pink2);padding:8px 14px;border-radius:999px;font-size:14px;cursor:pointer}
+  .tab.active{background:var(--pink2);color:white;box-shadow:0 6px 16px rgba(251,113,133,.35)}
+  main{padding:24px 16px 100px}
+  section{display:none}
+  section.active{display:block}
+
+  /* Floating hearts background */
+  .bg-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .heart{position:absolute;animation:fly var(--t) linear infinite;opacity:0}
+  @keyframes fly{0%{transform:translateY(110vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh);opacity:0}}
+
+  /* Cards / boxes */
+  .card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:16px;box-shadow:0 8px 24px rgba(255,182,193,.18)}
+  .btn{background:var(--pink2);color:#fff;border:0;border-radius:12px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 14px rgba(251,113,133,.35)}
+  .btn:active{transform:translateY(1px)}
+  .pill{display:inline-block;background:#fff;border:1px solid var(--border);border-radius:999px;padding:6px 10px;color:var(--pink2);font-weight:600}
+
+  /* Game area */
+  #game-area{position:relative;height:420px;border:1px solid var(--border);border-radius:24px;background:linear-gradient(#ffe4e6,#fff);overflow:hidden}
+  .fall{position:absolute;will-change:transform;animation:fall var(--spd) linear forwards}
+  @keyframes fall{from{transform:translateY(-10%)}to{transform:translateY(110%)} }
+
+  /* Gallery */
+  .grid{display:grid;gap:16px}
+  @media(min-width:760px){.grid.two{grid-template-columns:1fr 1fr}}
+  .photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:24px;border:1px solid var(--border);box-shadow:0 10px 20px rgba(255,182,193,.25)}
+  .big{font-size:clamp(24px,4vw,38px);font-weight:800;color:var(--pink2);line-height:1.15}
+  .fade{animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* Love meter */
+  .meter{height:22px;background:#ffe4e6;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+  .bar{height:100%;background:var(--pink2);width:0%}
+
+  /* Music widget */
+  .music{position:fixed;right:12px;bottom:12px;z-index:30;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:16px;padding:8px 12px;display:flex;align-items:center;gap:8px}
+  .tiny{font-size:12px;color:var(--pink2)}
+
+  /* Start overlay */
+  .overlay{position:fixed;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);z-index:40}
+  .pop{animation:pop .35s ease}
+  @keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <!-- Floating hearts background -->
+  <div class="bg-hearts" id="bg">
+    <!-- hearts will be injected -->
+  </div>
+
+  <header>
+    <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div class="brand">tặng tvy ♡</div>
+      <nav>
+        <button class="tab active" data-page="game">gêm</button>
+        <button class="tab" data-page="gallery">adeu ai xinh v</button>
+        <button class="tab" data-page="love">thước đo chim</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Page 1: Game -->
+    <section id="page-game" class="active">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="pill">Điểm: <b id="score">0</b></div>
+        <div class="pill">Thời gian: <b id="time">20</b>s</div>
+        <button class="btn" id="start">Vô đê</button>
+      </div>
+      <div id="game-area" class="card">
+        <div id="game-tip" style="position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--ink)">
+          <div>
+            <div class="big" style="margin-bottom:6px">gêm bắt tim t</div>
+            <div>nhấn vào càng nhiều 💖 càng tốt trong 20 giây nha cn cho!!!!1</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 2: Gallery + Compliments -->
+    <section id="page-gallery">
+      <div class="grid two">
+        <div>
+          <div id="compliment" class="big fade">Xinh nhất thế giới này!!!</div>
+          <div style="margin-top:8px;color:var(--pink2)">5s là 1 câu khen đó =))</div>
+        </div>
+        <div>
+          <!-- Replace her.jpg with your image path -->
+          <img src="her.jpg" alt="Em xinh đẹp" class="photo" />
+        </div>
+      </div>
+
+      <div style="margin-top:16px" class="card">
+        <details>
+          <summary style="cursor:pointer;color:var(--pink2);font-weight:700">Vài lời nhắc dành cho tvyyyy</summary>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px">
+            <div class="card">dạo này chơi mưa nhiều ó nhớ mang áo mưa đó nhaaaa, đi mưa về nhớ đắp chăn hong cảm đó</div>
+            <div class="card">ăn uống đầy đủ đi nhaaaa, nghe tvy nói bị bầm tay tui lo với thương vllll</div>
+            <div class="card">khen bản thân nhiều lên nhaaaa tvy xinh mà</div>
+            <div class="card">có ji bùn cứ kể tui nhé tui lắng nghe ở bên tvyy nhéee</div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Page 3: Love letter -->
+    <section id="page-love">
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-size:22px;font-weight:800;color:var(--pink2);margin-bottom:6px">tình yêu của tui dành cho Vy</div>
+        <div style="color:#9d174d">ko đo bằng con số được đâu 😭… nhưng tạm đo thế này cho vui nè:</div>
+      </div>
+      <div class="card">
+        <div class="meter"><div id="bar" class="bar"></div></div>
+        <div style="text-align:right;margin-top:6px;color:#9d174d;font-weight:700"><span id="pct">0</span>000000000% (và còn tăng mãi…)</div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <p class="fade">Tvy bước vào đời tui tui vui lắm á tvy dth xinh đẹp biết qtam tui, iu tvy vll</p>
+        <p class="fade">tui iu mọi thứ về tvy nên dù có như nào tui vẫn ở bên b nhée</p>
+        <p class="fade">dù ngày mai có thế nào lời hứa của tui vẫn vậy ở đây, nắm tay tvy, cùng nhau trải qua mọi thứ nhá.</p>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px">
+        <div class="card">chơi gêm đến khuyaaa</div>
+        <div class="card">xem phim tvy thích</div>
+        <div class="card">nghe nhạc cùng nhauuu</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Music controller (music persists while switching pages) -->
+  <div class="music card" style="gap:8px">
+    <audio id="audio" src="song1.mp3" preload="auto" loop></audio>
+    <button class="btn" id="toggle-music" style="padding:6px 10px">♫ Start music</button>
+    <span class="tiny">wu sen mi nu</span>
+  </div>
+
+  <!-- Start overlay to allow audio on mobile/autoplay rules -->
+  <div id="overlay" class="overlay">
+    <div class="card pop" style="text-align:center">
+      <div class="big" style="margin-bottom:6px">tặng tvy nèeee 💘</div>
+      <div style="color:var(--ink);margin-bottom:12px">nhấn điii.</div>
+      <button class="btn" id="begin">voooo ✨</button>
+    </div>
+  </div>
+
+<script>
+// --- Simple router ---
+const tabs = document.querySelectorAll('.tab');
+const sections = {
+  game: document.getElementById('page-game'),
+  gallery: document.getElementById('page-gallery'),
+  love: document.getElementById('page-love')
+};
+let current = 'game';
+function show(p){
+  if(p===current) return;
+  sections[current].classList.remove('active');
+  tabs.forEach(t=>t.classList.remove('active'));
+  sections[p].classList.add('active');
+  document.querySelector(`.tab[data-page="${p}"]`).classList.add('active');
+  current = p;
+}
+
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.page)));
+
+// --- Floating hearts background ---
+const bg = document.getElementById('bg');
+function spawnHearts(){
+  for(let i=0;i<18;i++){
+    const e=document.createElement('div');
+    e.className='heart';
+    e.textContent = Math.random()<.25 ? '💘' : '❤️';
+    e.style.left = (Math.random()*100)+'vw';
+    e.style.fontSize = (18+Math.random()*22)+'px';
+    e.style.animationDelay = (Math.random()*5)+'s';
+    e.style.setProperty('--t',(12+Math.random()*10)+'s');
+    bg.appendChild(e);
+  }
+}
+spawnHearts();
+
+// --- Music controls ---
+const audio = document.getElementById('audio');
+const toggleBtn = document.getElementById('toggle-music');
+function playMusic(){ audio.play().catch(()=>{}); }
+function toggleMusic(){ if(audio.paused){audio.play(); toggleBtn.textContent='♫ Pause';} else {audio.pause(); toggleBtn.textContent='♫ Play';}}
+
+document.getElementById('begin').addEventListener('click',()=>{
+  document.getElementById('overlay').style.display='none';
+  playMusic();
+  toggleBtn.textContent='♫ Pause';
+});
+
+toggleBtn.addEventListener('click',()=>{ toggleMusic(); });
+
+// --- Compliments rotate every 5s ---
+const compliments=[
+  'Xinh nhất vũ trụ này',
+  'Đáng yêu level max',
+  'Nụ cười làm trái tim rung rinh (rizz)',
+  'Mỗi ngày đều xinh hơn hôm qua(rizz)',
+  'Đôi mắt của tvy là sao của tui',
+  'Hôm nay nhớ mặc ấm và ăn đủ bữa nha',
+  'Uống nhiều nước ngủ đủ giấc dcm',
+  'Iu ghia',
+  'Tự hào vì có e 😞😞'
+];
+let cidx=0; const compEl=document.getElementById('compliment');
+setInterval(()=>{ cidx=(cidx+1)%compliments.length; compEl.textContent=compliments[cidx]; compEl.classList.remove('fade'); void compEl.offsetWidth; compEl.classList.add('fade'); },5000);
+
+// --- Love meter ---
+let pct=0; const bar=document.getElementById('bar'); const pctEl=document.getElementById('pct');
+setInterval(()=>{ pct=Math.min(100,pct+1); bar.style.width=pct+'%'; pctEl.textContent=pct; },25);
+
+// --- Mini game (Catch the Hearts) ---
+let running=false, score=0, timeLeft=20, spawnTimer, tickTimer;
+const scoreEl=document.getElementById('score');
+const timeEl=document.getElementById('time');
+const area=document.getElementById('game-area');
+const tip=document.getElementById('game-tip');
+
+function spawnOne(){
+  const btn=document.createElement('button');
+  btn.className='fall'; btn.textContent='💖'; btn.style.border='0'; btn.style.background='transparent';
+  const x = 5 + Math.random()*90; btn.style.left = x+'%';
+  const size = 24+Math.random()*22; btn.style.fontSize=size+'px';
+  const spd = 3000+Math.random()*2500; btn.style.setProperty('--spd',spd+'ms');
+  btn.addEventListener('click',()=>{ score++; scoreEl.textContent=score; btn.remove(); });
+  area.appendChild(btn);
+  setTimeout(()=>btn.remove(), spd+100);
+}
+
+function startGame(){
+  if(running) return; running=true; score=0; timeLeft=20; scoreEl.textContent='0'; timeEl.textContent='20';
+  tip.style.display='none';
+  spawnTimer=setInterval(spawnOne,300);
+  tickTimer=setInterval(()=>{
+    timeLeft--; timeEl.textContent=timeLeft;
+    if(timeLeft<=0){ endGame(); }
+  },1000);
+}
+
+function endGame(){
+  running=false; clearInterval(spawnTimer); clearInterval(tickTimer);
+  const panel=document.createElement('div');
+  panel.className='card pop';
+  panel.style.position='absolute'; panel.style.inset='0'; panel.style.display='grid'; panel.style.placeItems='center'; panel.style.textAlign='center';
+  panel.innerHTML=`<div><div class="big" style="margin-bottom:6px">Hết giờ!</div><div>Tvy đã bắt được <b>${score}</b> trái tim. Mỗi trái tim = 1 brutally seg nha </div><div style="margin-top:10px"><button class="btn" id="again">Chơi nữa</button></div></div>`;
+  area.appendChild(panel);
+  document.getElementById('again').addEventListener('click',()=>{ panel.remove(); startGame(); });
+}
+
+document.getElementById('start').addEventListener('click',startGame);
+</script>
+</body>
+</html>
+
+
